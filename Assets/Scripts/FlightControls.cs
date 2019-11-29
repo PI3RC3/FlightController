@@ -5,7 +5,7 @@ using UnityEngine;
 public class FlightControls : MonoBehaviour
 {
 
-    public float mainSpeed = 50.0f;                        //Standard speed
+    public float mainSpeed = 50.0f;                         //Standard speed
     public float shiftAdd = 150.0f;                         //Shift speed modifier
     public float maxShift = 1000.0f;                        //Maximum speed when holdin gshift
     public float cameraSense = 1.5f;                        //Camera movement speed
@@ -15,7 +15,6 @@ public class FlightControls : MonoBehaviour
 
     void Update()
     {
-
         //Activate manual flight controls
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
@@ -26,7 +25,7 @@ public class FlightControls : MonoBehaviour
             ActivateMouseLook(false);
         }
 
-        //Vector from mouse angle
+        //Euler from mouse input
         if (mouseLookActive)
         {
             float newRotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * cameraSense;
@@ -34,8 +33,22 @@ public class FlightControls : MonoBehaviour
             transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
         }
 
-        //Movement
+        //Yaw from keyboard input
+        if(Input.GetKey(KeyCode.Z))
+        {
+            float newRotationY = transform.localEulerAngles.y + 1f * (Time.deltaTime * mainSpeed);
+            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, newRotationY, 0.0f);
+        }
+        else if(Input.GetKey(KeyCode.C))
+        {
+            float newRotationY = transform.localEulerAngles.y -1f * (Time.deltaTime * mainSpeed);
+            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, newRotationY, 0.0f);
+        }
+
+        //Movement vector
         Vector3 p = GetBaseInput();
+
+        //Speed boost
         if (Input.GetKey(KeyCode.LeftShift))
         {
             totalRun += Time.deltaTime;
@@ -51,7 +64,9 @@ public class FlightControls : MonoBehaviour
         }
 
         p = p * Time.deltaTime;
+
         Vector3 newPosition = transform.position;
+
         if (Input.GetKey(KeyCode.Space))
         { //If player wants to move on X and Z axis only
             transform.Translate(p);
