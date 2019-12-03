@@ -4,8 +4,8 @@ public class MovetoWaypoint : MonoBehaviour
 {
     public static MovetoWaypoint instance;      //Targets will be set via UI buttons.  Script usage:  MovetoWaypoint.instance.target = targetObject;
     public Transform target;                    //Game Object that camera will be matching position and rotation of
-    public float moveSpeed = 10.0f;             //Movement to target object
-    public int panSpeedDivisor = 4;             //MoveSpeed divisior
+    public float moveSpeed = 30.0f;             //Movement to target object
+    public float panSpeed = 0.8f;               //Turn to face target
 
     private Vector3 relativePosition;
     private Quaternion targetRotation;
@@ -50,16 +50,16 @@ public class MovetoWaypoint : MonoBehaviour
             }
 
             //Turn to face target
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, (moveSpeed * Time.deltaTime) / panSpeedDivisor);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, panSpeed * Time.deltaTime);
 
             //Move toward target
+            Debug.Log("Move Speed to Target: " + moveSpeed.ToString());
             transform.position = Vector3.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
         }
         else
         {
             //If you try and lerp to match a target's Quaternion, and you are both at the same position, you 
-            //end up with a vector zero error (see above).  So, the easiest option I have found is to project 
-            //a ghost from the current position, then turn towards that object.
+            //end up with a vector zero error (see above).
             
             //Project Ghost Target  
             GameObject ghost = new GameObject();
@@ -71,7 +71,7 @@ public class MovetoWaypoint : MonoBehaviour
             var ghostRelativePosition = ghost.transform.position - transform.position;
 
             //Turn to face same angle as waypoint target
-            transform.rotation = Quaternion.Lerp(transform.rotation, ghost.transform.rotation, (moveSpeed * Time.deltaTime) / panSpeedDivisor);
+            transform.rotation = Quaternion.Lerp(transform.rotation, ghost.transform.rotation, panSpeed * Time.deltaTime);
             Destroy(ghost);
         }
     }
